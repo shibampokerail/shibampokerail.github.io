@@ -1,32 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Shibam Pokhrel</title>
-<link rel="stylesheet" href="styles/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shibampokerail — this site should not exist</title>
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0d0b08;
+      --paper: #ede3cc;
+      --blood: #7a0000;
+      --rust: #8a4a1a;
+      --muted: #3a2e1e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      background: #080604;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── GRAIN ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      background-size: 250px 250px;
+      opacity: 0.38;
+      animation: grain 0.35s steps(1) infinite;
+    }
+    @keyframes grain {
+      0%,100%{background-position:0 0} 10%{background-position:-5% -10%}
+      20%{background-position:-15% 5%} 30%{background-position:7% -25%}
+      40%{background-position:-5% 25%} 50%{background-position:-15% 10%}
+      60%{background-position:15% 0%} 70%{background-position:0 15%}
+      80%{background-position:3% 35%} 90%{background-position:-10% 10%}
+    }
+
+    /* ── BOOT ── */
+    #boot {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #080604;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      animation: bootFade 0.5s 3.4s forwards;
+    }
+    @keyframes bootFade { to { opacity: 0; pointer-events: none; } }
+    #boot-text {
+      font-family: 'Courier Prime', monospace;
+      color: #3a2e1e;
+      font-size: clamp(9px, 1.1vw, 12px);
+      line-height: 1.8; letter-spacing: 0.06em;
+      white-space: pre;
+    }
+    .bc {
+      display: inline-block; width: 0.55em; height: 0.9em;
+      background: #3a2e1e; animation: blink 0.7s step-end infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── PAGE ── */
+    #page {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem);
+      opacity: 0;
+      animation: pageReveal 1.4s 3.9s ease forwards;
+    }
+    @keyframes pageReveal { to { opacity: 1; } }
+
+    /* ── BROADSHEET ── */
+    .broadsheet {
+      max-width: 780px;
+      width: 100%;
+      background: var(--paper);
+      position: relative;
+      box-shadow:
+        0 0 0 1px #4a3820,
+        0 0 0 5px #1a1208,
+        0 0 90px rgba(0,0,0,0.97),
+        inset 0 0 120px rgba(0,0,0,0.06);
+      transform: rotate(-0.3deg);
+    }
+    .broadsheet::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 8% 8%, rgba(160,120,60,0.2) 0%, transparent 45%),
+        radial-gradient(ellipse at 92% 92%, rgba(80,40,10,0.16) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.13) 0%, transparent 40%);
+    }
+    /* fold crease */
+    .broadsheet::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: linear-gradient(90deg,
+        transparent 49.4%,
+        rgba(0,0,0,0.06) 49.65%,
+        rgba(255,255,255,0.04) 50%,
+        rgba(0,0,0,0.045) 50.35%,
+        transparent 50.6%
+      );
+    }
+
+    .broadsheet-inner {
+      position: relative; z-index: 1;
+      padding: clamp(1.5rem, 4vw, 2.8rem);
+    }
+
+    /* ════ MASTHEAD (stripped) ════ */
+    .masthead {
+      text-align: center;
+      margin-bottom: 0;
+    }
+    .masthead-tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(0.72rem, 1.6vw, 0.86rem);
+      color: var(--muted); letter-spacing: 0.07em;
+      display: block; margin-bottom: 0.45rem;
+    }
+    .masthead-bottombar {
+      border-top: 1px solid var(--ink);
+      border-bottom: 3px double var(--ink);
+      padding: 0.28rem 0;
+      display: flex; justify-content: center; gap: 2rem;
+    }
+    .masthead-bottombar span {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.56rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
+    }
+
+    /* ════ RULES ════ */
+    .sec-rule {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin: 0.85rem 0;
+    }
+    .sec-rule::before, .sec-rule::after {
+      content: ''; flex: 1; height: 1px; background: var(--ink);
+    }
+    .sec-rule span {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem; color: var(--blood);
+    }
+
+    /* ════ HEADLINE BLOCK ════ */
+    .headline-block { text-align: center; margin-bottom: 0.5rem; }
+    .kicker {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.57rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--rust);
+      display: block; margin-bottom: 0.4rem;
+    }
+    .headline {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2.1rem, 6vw, 3.5rem);
+      line-height: 1.03; color: var(--ink); letter-spacing: -0.025em;
+    }
+    .headline em { font-style: italic; color: var(--blood); }
+
+    /* glitch */
+    .glitch { position: relative; display: inline; }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    }
+    .glitch::before {
+      color: var(--blood); animation: gTop 5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+    }
+    .glitch::after {
+      color: #1a3a2a; animation: gBot 5s infinite;
+      clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+    }
+    @keyframes gTop {
+      0%,88%,100%{transform:none;opacity:0}
+      89%{transform:translate(-3px,-2px);opacity:0.85}
+      91%{transform:translate(3px,1px);opacity:0.85}
+      93%{transform:none;opacity:0}
+    }
+    @keyframes gBot {
+      0%,88%,100%{transform:none;opacity:0}
+      90%{transform:translate(3px,2px);opacity:0.85}
+      92%{transform:translate(-3px,-1px);opacity:0.85}
+      94%{transform:none;opacity:0}
+    }
+
+    .deck {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: clamp(0.82rem, 1.8vw, 0.98rem);
+      color: var(--muted); line-height: 1.55; margin-top: 0.5rem;
+    }
+
+    /* ════ TWO-COLUMN BODY ════ */
+    .body-grid {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 1.6rem;
+      margin: 0.75rem 0;
+      align-items: start;
+    }
+    .col-rule {
+      align-self: stretch;
+      background: var(--ink); opacity: 0.18;
+    }
+    .col p {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(0.74rem, 1.45vw, 0.86rem);
+  line-height: 1.8;
+  color: #241a0e;
+  text-align: justify;
+
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.no-break {
+  white-space: nowrap;
+}
+    .col p + p { margin-top: 0.75em; text-indent: 1.2em; }
+
+    /* inline newspaper links */
+    .ink-link {
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--rust);
+      font-weight: 700;
+      font-style: italic;
+      transition: color 0.15s;
+    }
+    .ink-link:hover { color: var(--blood); text-decoration-style: solid; }
+
+    /* ════ PULL QUOTES ════ */
+    .pull-quote {
+      border-top: 2.5px solid var(--ink);
+      border-bottom: 2.5px solid var(--ink);
+
+      padding: 1rem 2.5rem;
+      margin: 1.1rem 0;
+      text-align: center;
+      position: relative;
+    }
+    .pull-quote::before {
+      content: '\201C';
+      position: absolute; top: -1.1rem; left: 0.7rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem; line-height: 1;
+      color: var(--blood); opacity: 0.3;
+    }
+    .pull-quote p {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: clamp(0.92rem, 2.1vw, 1.12rem);
+      line-height: 1.6; color: var(--blood);
+    }
+
+    /* ════ ATTRIBUTION ════ */
+    .attribution {
+      text-align: right;
+      margin-top: 1.4rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid rgba(13,11,8,0.2);
+    }
+    .attribution p {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(0.82rem, 1.6vw, 0.98rem);
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .attribution span {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ════ FOOTER ════ */
+    .obit-footer {
+      margin-top: 1.1rem;
+      border-top: 3px double var(--ink);
+      padding-top: 0.65rem;
+      display: flex;
+      justify-content: space-between; align-items: flex-end;
+      gap: 1rem;
+    }
+    .obit-footer p {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.55rem; letter-spacing: 0.1em;
+      color: #6a5040; text-transform: uppercase; line-height: 1.7;
+    }
+
+    /* ════ AMBIENT ════ */
+    .ambient {
+      position: fixed; width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(100,40,10,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: ambPulse 9s ease-in-out infinite;
+    }
+    @keyframes ambPulse {
+      0%,100%{ opacity:.5; transform:translate(-50%,-50%) scale(1); }
+      50%    { opacity:1;  transform:translate(-50%,-50%) scale(1.15); }
+    }
+
+    @media (max-width: 580px) {
+      .body-grid { grid-template-columns: 1fr; }
+      .col-rule { display: none; }
+      .masthead-bottombar { flex-direction: column; gap: 0.15rem; }
+      .pull-quote { padding: 0.9rem 1rem; }
+      .obit-footer { flex-direction: column; text-align: center; }
+    }
+  </style>
 </head>
-<div>
-    <nav>
-        <ul id="nav-list">
-          <li><a data-value="about" href="#">about</a></li>
-          <li><a data-value="projects" href="#">projects</a></li>
-          <li><a data-value="resume" href="#">resume</a></li>
-          <li><a data-value="contact" href="#">contact</a></li>
-          <li><a data-value="linkedin" href="#">linkedin</a></li>
-          <li><a data-value="github" href="#">github</a></li>
-        </ul>
-      </nav>
-</div>
 <body>
-<!-- <h3>******************************************</h3> -->
 
-<h1 data-value="SHIBAM_POKHREL" >SHIBAM_POKHREL</h1>
-<h3>Welcome to my portfolio website!</h3>
-<h3>type help for a list of supported commands.</h3>
-<h3>********************************************</h3>
-<input type="text" id="pop-keyboard" class="inpu">
-<h2 id="my-heading" onclick="">@shibampokhrel><span id="input-command"></span><em class="cursor">_</em></h2>
-<h2 id="response"></h2>
-<!-- <input type="text" name="username" id="my-input" value="" oninput="adjustSize(this)" size=0> -->
+<div class="ambient"></div>
+
+<!-- ════ BOOT ════ -->
+<div id="boot">
+  <pre id="boot-text">
+SYSTEM v4.1.1 — COLD START
+────────────────────────────────────────────────
+Checking portfolio...
+<span style="color:#5a3a1a">WARN :</span> file is past relevance
+<span style="color:#7a0000">ERROR:</span> target audience not found
+<span style="color:#7a0000">ERROR:</span> recruiter inboxes now automated
+<span style="color:#7a0000">ERROR:</span> AI generated an identical site in 11 seconds
+<span style="color:#7a0000">ERROR:</span>
+────────────────────────────────────────────────
+<span style="color:#4a6a3a">PASS :</span> github.com/shibampokerail — alive
+<span style="color:#4a6a3a">PASS :</span> linkedin profile — operational
+────────────────────────────────────────────────
+Hey Claude, build me a portfolio for an audience that isn’t there....<span class="bc"></span></pre>
+</div>
+
+<!-- ════ MAIN PAGE ════ -->
+<div id="page">
+ <div class="broadsheet">
+  <div class="broadsheet-inner">
+
+    <!-- MASTHEAD -->
+    <div class="masthead">
+<!--      <span class="masthead-tagline">"All The News That Didn't Need To Happen"</span>-->
+      <div class="masthead-bottombar">
+        <span>☩ Technology ☩</span>
+<!--        <span>Technology &amp; Human Obsolescence — Page 1</span>-->
+<!--        <span>Never To Be Printed Again</span>-->
+      </div>
+    </div>
+
+    <div class="sec-rule"><span>✦</span></div>
+
+    <!-- HEADLINE -->
+    <div class="headline-block">
+      <span class="kicker">☩ Breaking — Technology ☩</span>
+      <h1 class="headline">
+        <span class="glitch" data-text="Portfolio Websites">Portfolio Websites</span>
+        Are <em>Dead.</em>
+      </h1>
+      <p class="deck">And yet, here we are.</p>
+    </div>
 
 
+    <div class="sec-rule"><span>✦</span></div>
+
+    <div class="body-grid">
+
+      <div class="col">
+        <p>The portfolio website, that proud, painstaking monument to one's professional self, is practically dead after the language models learned to generate one in seconds. Not a rough draft. A finished product. With animations. And a contact form. And a testimonials section from clients that don't exist yet, written in a voice indistinguishable from the human who spent the weekend building the real one.</p>
+        <p>They are simply a collection of hero sections that no one scrolls, project thumbnails no one clicks, and "About Me" paragraphs that beging, without exception, with the words <em>"I'm a passionate developer."</em></p>
+        <p>The machine is also passionate. It will tell you so. It will tell you in twelve languages, at four in the morning, without needing a break.</p>
+      </div>
+
+      <div class="col-rule"></div>
+
+      <div class="col">
+        <p>The profession the portfolio was built to impress began vanishing alongside it. Recruiters replaced by pipelines. Hiring decisions delegated to algorithms that parse a <a class="ink-link no-break" href="https://github.com/shibampokerail" target="_blank" rel="noopener noreferrer">GitHub commit history</a> without ever loading a page, counting green squares like a verdict, reading diffs like a biography. The audience evaporated. The applause cut off mid-sentence.</p>
+        <p>Nobody was on the other end of the contact form.</p>
+        <p>What survives is only what was always true: the actual work, and the <a class="ink-link no-break" href="https://www.linkedin.com/in/shibampokhrel/" target="_blank" rel="noopener noreferrer">professional theater</a> we have all agreed to keep performing, for reasons nobody has articulated convincingly. That is the whole picture. And will always be</p>
+      </div>
+
+    </div>
+          <div class="sec-rule"></div>
+
+    <br/>
+    <!-- PULL QUOTE 1 -->
+
+
+    <!-- PULL QUOTE 2 — tighter, more brutal -->
+    <div class="pull-quote" style="border: none; margin-top: -0.6rem; padding-top: 0.7rem;  margin-bottom: -0.9rem;">
+      <p>
+        You spent days picking a font. <br>
+          The model spent seconds <br> replacing the job you were building it for.<br/>
+          The portfolio was always a letter<br/>
+        to someone who had already decided.
+      </p>
+    </div>
+
+    <!-- ATTRIBUTION -->
+    <div class="attribution" style="border: none;  margin-top: -0.6rem;">
+      <p>— <span>Shibam Pokhrel  </span> <br> <small> <a class="ink-link" href="https://www.linkedin.com/in/shibampokhrel/">LinkedIn</a>  | <a class="ink-link" href="https://github.com/shibampokerail">Github</a> </small></p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="obit-footer">
+<!--      <p><a class="ink-link" href="https://www.linkedin.com/in/shibampokhrel/">linkedIn</a>  <br> <a class="ink-link" href="https://github.com/shibampokerail">Github</a> </p>-->
+      <p style="text-align:right;">© 2026 · Nobody Cares<br/>GLHF</p>
+    </div>
+
+  </div>
+ </div>
+</div>
+
+<script>
+  // BOOT TYPEWRITER
+  const bootEl = document.getElementById('boot-text');
+  const lines = bootEl.innerHTML.split('\n');
+  bootEl.innerHTML = '';
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i < lines.length) {
+      bootEl.innerHTML += (i > 0 ? '\n' : '') + lines[i];
+      i++;
+    } else { clearInterval(iv); }
+  }, 110);
+
+  // OCCASIONAL SHUDDER
+  const sheet = document.querySelector('.broadsheet');
+  setInterval(() => {
+    if (Math.random() < 0.03) {
+      sheet.style.transition = 'transform 0.05s';
+      sheet.style.transform = `rotate(${(Math.random()-0.5)*1.1}deg) translateX(${(Math.random()-0.5)*4}px)`;
+      setTimeout(() => { sheet.style.transform = 'rotate(-0.3deg)'; }, 85);
+    }
+  }, 3000);
+
+  // BLOOD CURSOR TRAIL
+  const trail = [];
+  for (let t = 0; t < 7; t++) {
+    const d = document.createElement('div');
+    const sz = 4 - t * 0.35;
+    d.style.cssText = `
+      position:fixed;width:${sz}px;height:${sz}px;
+      border-radius:50%;background:rgba(122,0,0,${0.52 - t*0.06});
+      pointer-events:none;z-index:10000;
+      transition:left ${0.04+t*0.045}s ease,top ${0.04+t*0.045}s ease;
+      transform:translate(-50%,-50%);
+    `;
+    document.body.appendChild(d);
+    trail.push(d);
+  }
+  document.addEventListener('mousemove', e => {
+    trail.forEach(d => { d.style.left = e.clientX+'px'; d.style.top = e.clientY+'px'; });
+  });
+</script>
 </body>
-
-<script src="scripts/script.js"></script>
+</html>
